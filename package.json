@@ -1,0 +1,28 @@
+{
+  "name": "tickets",
+  "version": "1.0.0",
+  "description": "App for event ticketing and access control",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zgarciaa/tickets-app.git"
+  },
+  "keywords": [
+    "electron",
+    "desktop",
+    "tickets",
+    "access control"
+  ],
+  "author": "Nicolas Garcia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zgarciaa/tickets-app/issues"
+  },
+  "homepage": "https://github.com/zgarciaa/tickets-app#readme",
+  "devDependencies": {
+    "electron": "^22.0.3"
+  }
+}
