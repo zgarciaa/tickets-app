@@ -6,12 +6,16 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
     <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
     <title>Venta de Tiquetes</title>
 </head>
 
 <body>
-    <h1>Hello from Electron renderer!</h1>
+    <h1>Venta de Tiquetes</h1>
     <p id="info"></p>
+    <div class="text-center">
+        <button type="button" class="btn btn-primary">Imprimir Tiquete</button>
+    </div>
 
     <script src="./renderer.js"></script>
 </body>
