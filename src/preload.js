@@ -1,21 +1,30 @@
-const { contextBridge } = require("electron");
+const { contextBridge, ipcRenderer } = require("electron");
 const { AES, enc } = require("crypto-js");
+const path = require("path");
 
 contextBridge.exposeInMainWorld("cryptography", {
-    encrypt: (originalData) => {
-        const data = {
-            username: AES.encrypt(originalData.username, "enc_key").toString(),
-            password: AES.encrypt(originalData.password, "enc_key").toString()
+    encrypt: (data) => {
+        const _data = {
+            username: AES.encrypt(data.username, "enc_key").toString(),
+            password: AES.encrypt(data.password, "enc_key").toString()
         };
-        return data;
+        return _data;
     },
-    decrypt: (encryptedData) => {
-        const bUsername = AES.decrypt(encryptedData.username, "enc_key");
-        const bPassword = AES.decrypt(encryptedData.password, "enc_key");
-        const data = {
+    decrypt: (data) => {
+        const bUsername = AES.decrypt(data.username, "enc_key");
+        const bPassword = AES.decrypt(data.password, "enc_key");
+        const _data = {
             username: bUsername.toString(enc.Utf8),
             password: bPassword.toString(enc.Utf8)
         };
-        return data;
+        return _data;
+    }
+});
+
+contextBridge.exposeInMainWorld("newWindow", {
+    userRegister: () => {
+        ipcRenderer.send("new-window", path.join(__dirname, "./ui/login/index.html"));
+        console.log("New Window");
     }
 })
+
