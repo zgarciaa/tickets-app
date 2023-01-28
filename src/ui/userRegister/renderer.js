@@ -1,11 +1,14 @@
 const username = document.querySelector("#username");
 const password = document.querySelector("#password");
-const userRegForm = document.querySelector("#userRegForm");
+const form = document.querySelector("#form");
 
-userRegForm.addEventListener("submit", (event) => {
+form.addEventListener("submit", (event) => {
     event.preventDefault();
-    console.log({
+    //Encrypt user data
+    const userData = window.cryptography.encryptData({
         username: username.value,
         password: password.value
     });
+
+    // Save user in database if not exists
 });

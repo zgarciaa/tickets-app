@@ -1,5 +1,7 @@
-const { app, BrowserWindow, Menu, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
+const { encryptData, decryptData } = require("./utils/crypto");
+const { getConnection, createUsersTable } = require("./utils/database");
 
 const createMainWindow = () => {
     const window = new BrowserWindow({
@@ -12,77 +14,32 @@ const createMainWindow = () => {
     });
     window.loadFile(path.join(__dirname, "./ui/login/index.html"));
     window.webContents.openDevTools();
-
-    /*
-    loginWindow.webContents.setWindowOpenHandler(({ url }) => {
-        if (url === "src/ui/userRegister/index.html") {
-            return {
-                action: 'allow',
-                overrideBrowserWindowOptions: {
-                    webPreferences: {
-                        preload: path.join(__dirname, "preload.js"),
-                        nodeIntegration: true
-                    }
-                }
-            };
-        }
-        return { action: 'deny' }
-    });
-    */
-};
-
-// Create user register window
-const createUserRegisterWindow = () => {
-    const window = new BrowserWindow({
-        width: 800,
-        height: 600,
-        webPreferences: {
-            preload: path.join(__dirname, "preload.js"),
-            nodeIntegration: true
-        }
-    });
-    window.loadFile(path.join(__dirname, "./ui/userRegister/index.html"));
 };
 
 app.whenReady().then(() => {
     createMainWindow();
-
-    // Menu Template
-    const menuTemplate = [
-        {
-            label: "Archivo",
-            submenu: [
-                {
-                    label: "Ayuda",
-                    click: () => console.log("Menu Ayuda")
-                },
-                { type: "separator" },
-                {
-                    label: "Salir",
-                    click: () => app.quit(),
-                    accelerator: "Ctrl+W"
-                }
-            ]
-        },
-        {
-            label: "Crear Usuario",
-            click: createUserRegisterWindow
-        }
-    ];
-
-    const mainMenu = Menu.buildFromTemplate(menuTemplate);
-    Menu.setApplicationMenu(mainMenu);
-
-    ipcMain.on("new-window", (event, arg) => {
+    createUsersTable();
+    
+    // Create New Window
+    ipcMain.on("new-window", (event, file) => {
         event.preventDefault();
         const newWindow = new BrowserWindow({
             width: 800,
             height: 600,
             webPreferences: {
                 preload: path.join(__dirname, "preload.js"),
-                nodeIntegration: true
+                nodeIntegration: true,
             }
         });
-        newWindow.loadFile(arg);
-    })
+        newWindow.loadFile(file);
+    });
+
+    ipcMain.on("encrypt-data", (event, data) => {
+        //event.preventDefault();
+        encryptData(data);
+    });
+    ipcMain.on("decrypt-data", (event, data) => {
+        //event.preventDefault();
+        decryptData(data);
+    });
 });
