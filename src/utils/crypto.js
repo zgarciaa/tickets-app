@@ -1,21 +1,20 @@
 const { AES, enc } = require("crypto-js");
 
-const encryptData = ({ username, password }) => {
-    const _data = {
-        username: AES.encrypt(username, "enc_key").toString(),
-        password: AES.encrypt(password, "enc_key").toString()
+const encryptData = ({ username, password }, decrypt) => {
+    if (!decrypt) {
+        const data = {
+            username: AES.encrypt(username, "enc_key").toString(),
+            password: AES.encrypt(password, "enc_key").toString()
+        };
+        console.log("Encrypt", data);
+        return data;
+    }
+    const data = {
+        username: AES.decrypt(username, "enc_key").toString(enc.Utf8),
+        password: AES.decrypt(password, "enc_key").toString(enc.Utf8)
     };
-    return _data;
-};
+    console.log("Decrypt", data);
+    return data;
+}
 
-const decryptData = ({ username, password }) => {
-    const bUsername = AES.decrypt(username, "enc_key");
-    const bPassword = AES.decrypt(password, "enc_key");
-    const _data = {
-        username: bUsername.toString(enc.Utf8),
-        password: bPassword.toString(enc.Utf8)
-    };
-    return _data;
-};
-
-module.exports = { encryptData, decryptData };
+module.exports = { encryptData };

@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
-const { encryptData, decryptData } = require("./utils/crypto");
-const { getConnection, createUsersTable } = require("./utils/database");
+const crypto = require("./utils/crypto");
+const { initDb } = require("./utils/db/database");
 
 const createMainWindow = () => {
     const window = new BrowserWindow({
@@ -16,10 +16,10 @@ const createMainWindow = () => {
     window.webContents.openDevTools();
 };
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     createMainWindow();
-    createUsersTable();
-    
+    // Initialize database
+    await initDb();
     // Create New Window
     ipcMain.on("new-window", (event, file) => {
         event.preventDefault();
@@ -34,12 +34,12 @@ app.whenReady().then(() => {
         newWindow.loadFile(file);
     });
 
-    ipcMain.on("encrypt-data", (event, data) => {
+    ipcMain.on("encrypt-data", (event, data, decrypt) => {
         //event.preventDefault();
-        encryptData(data);
+        crypto.encryptData(data, decrypt);
     });
-    ipcMain.on("decrypt-data", (event, data) => {
+    ipcMain.on("decrypt-data", (event, data, decrypt) => {
         //event.preventDefault();
-        decryptData(data);
+        crypto.encryptData(data, decrypt);
     });
 });

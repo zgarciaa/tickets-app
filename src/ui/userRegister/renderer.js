@@ -8,7 +8,6 @@ form.addEventListener("submit", (event) => {
     const userData = window.cryptography.encryptData({
         username: username.value,
         password: password.value
-    });
-
-    // Save user in database if not exists
+    }, decrypt = false);
+    // Save user in database
 });
