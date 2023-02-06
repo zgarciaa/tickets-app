@@ -1,13 +1,18 @@
+const { ipcRenderer } = window.require("electron");
 const username = document.querySelector("#username");
 const password = document.querySelector("#password");
 const form = document.querySelector("#form");
 
 form.addEventListener("submit", (event) => {
     event.preventDefault();
-    //Encrypt user data
-    const userData = window.cryptography.encryptData({
+    const worker = {
         username: username.value,
         password: password.value
-    }, decrypt = false);
-    // Save user in database
+    };
+
+    // Send data to main
+    ipcRenderer.send("new-worker", worker);
 });
+
+
+

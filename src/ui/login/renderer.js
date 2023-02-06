@@ -1,3 +1,4 @@
+const { ipcRenderer } = window.require("electron");
 const username = document.querySelector("#username");
 const password = document.querySelector("#password");
 const form = document.querySelector("#form");
@@ -8,7 +9,8 @@ form.addEventListener("submit", (event) => {
 });
 
 btnRegister.addEventListener("click", () => {
-    window.newWindow.userRegister();
+    ipcRenderer.send("new-window", "src/ui/userRegister/index.html");
+    //window.newWindow.userRegister();
 });
 
 

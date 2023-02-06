@@ -1,20 +1,19 @@
 const { AES, enc } = require("crypto-js");
 
-const encryptData = ({ username, password }, decrypt) => {
+require("dotenv").config();
+const encryptData = ({ username, password }, decrypt = false) => {
+    const key = enc.Base64.parse(process.env.ENC_KEY);
+    const iv = enc.Base64.parse(process.env.ENC_IV);
     if (!decrypt) {
-        const data = {
-            username: AES.encrypt(username, "enc_key").toString(),
-            password: AES.encrypt(password, "enc_key").toString()
+        return {
+            username: AES.encrypt(username, key, { iv: iv }).toString(),
+            password: AES.encrypt(password, key, { iv: iv }).toString()
         };
-        console.log("Encrypt", data);
-        return data;
     }
-    const data = {
-        username: AES.decrypt(username, "enc_key").toString(enc.Utf8),
-        password: AES.decrypt(password, "enc_key").toString(enc.Utf8)
+    return {
+        username: AES.decrypt(username, key, { iv: iv }).toString(enc.Utf8),
+        password: AES.decrypt(password, key, { iv: iv }).toString(enc.Utf8)
     };
-    console.log("Decrypt", data);
-    return data;
-}
+};
 
 module.exports = { encryptData };

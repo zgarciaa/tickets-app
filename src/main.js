@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const crypto = require("./utils/crypto");
-const { initDb } = require("./utils/db/database");
+const db = require("./utils/db/database");
 
 const createMainWindow = () => {
     const window = new BrowserWindow({
@@ -9,7 +9,8 @@ const createMainWindow = () => {
         height: 720,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
-            nodeIntegration: true
+            nodeIntegration: true,
+            contextIsolation: false
         }
     });
     window.loadFile(path.join(__dirname, "./ui/login/index.html"));
@@ -19,7 +20,7 @@ const createMainWindow = () => {
 app.whenReady().then(async () => {
     createMainWindow();
     // Initialize database
-    await initDb();
+    await db.initDb();
     // Create New Window
     ipcMain.on("new-window", (event, file) => {
         event.preventDefault();
@@ -29,17 +30,15 @@ app.whenReady().then(async () => {
             webPreferences: {
                 preload: path.join(__dirname, "preload.js"),
                 nodeIntegration: true,
+                contextIsolation: false
             }
         });
         newWindow.loadFile(file);
     });
-
-    ipcMain.on("encrypt-data", (event, data, decrypt) => {
-        //event.preventDefault();
-        crypto.encryptData(data, decrypt);
-    });
-    ipcMain.on("decrypt-data", (event, data, decrypt) => {
-        //event.preventDefault();
-        crypto.encryptData(data, decrypt);
+    
+    ipcMain.on("new-worker", (event, worker) => {
+        const _worker = crypto.encryptData(worker);
+        console.log(_worker);
+        //db.insertWorker(_worker);
     });
 });

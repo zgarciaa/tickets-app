@@ -1,13 +1,10 @@
 const mysql = require("mysql2/promise");
-const sqlSentences = require("./sqlSentences");
+const sql = require("./sqlSentences");
+const { config } = require("../db/config");
 
 const getConnection = async () => {
     try {
-        const connection = await mysql.createConnection({
-            host: "localhost",
-            user: "root",
-            database: "tickets"
-        });
+        const connection = await mysql.createConnection(config);
         return connection;
     } catch (e) {
         console.error(e);
@@ -15,14 +12,14 @@ const getConnection = async () => {
 };
 
 const createDb = async () => {
+    let connection;
     try {
-        const connection = await mysql.createConnection({
-            host: "localhost",
-            user: "root"
+        connection = await mysql.createConnection({
+            host: config.host,
+            user: config.user
         });
-        const [rows, fields] = await connection.execute(`SHOW DATABASES LIKE 'tickets';`);
+        const [rows] = await connection.execute(`SHOW DATABASES LIKE 'tickets';`);
         if (rows.length > 0) {
-            console.log("Database already exists");
             connection.end();
             return;
         }
@@ -31,43 +28,100 @@ const createDb = async () => {
         console.log("Database was created succesfully");
     } catch (e) {
         console.error(e);
+    } finally {
+        connection.end();
     }
 };
 
-const createTable = async (tableName, tableSql) => {
+const createTables = async () => {
+    const connection = await getConnection();
     try {
-        const connection = await getConnection();
-        const [rows, fields] = await connection.execute(`SHOW TABLES LIKE '${tableName}'`);
-        if (rows.length > 0) {
-            console.log(`Table '${tableName}' already exists`);
-            connection.end();
-            return;
+        const [rowsRoles] = await connection.execute(`SHOW TABLES LIKE 'roles'`);
+        const [rowsRegister] = await connection.execute(`SHOW TABLES LIKE 'registros'`);
+        const [rowsWorkers] = await connection.execute(`SHOW TABLES LIKE 'trabajadores'`);
+        if (rowsRoles.length === 0) {
+            await connection.execute(sql.rolesTable);
+            await connection.execute(sql.insertRoles);
+            await connection.commit();
+            console.log("Table 'roles' created succesfully");
+        } else {
+            console.log("Table 'roles' already exists");
         }
-        await connection.execute(tableSql);
-        connection.end();
-        console.log(`Table '${tableName}' was created succesfully`);
+        if (rowsRegister.length === 0) {
+            await connection.execute(sql.registersTable);
+            await connection.execute(sql.insertInitialRegisters);
+            await connection.commit();
+            console.log("Table 'registros' created succesfully");
+        } else {
+            console.log("Table 'registros' already exists");
+        }
+        if (rowsWorkers.length === 0) {
+            await connection.execute(sql.workersTable);
+            await connection.commit();
+            console.log("Table 'trabajadores' created succesfully");
+        } else {
+            console.log("Table 'trabajadores' already exists");
+        }
     } catch (e) {
         console.error(e);
-        console.log("fallaste");
+    } finally {
+        connection.end();
     }
 };
 
-const createRolesTable = async () => {
+const insertNewRegister = async ({ name, roleId, fingerprint }) => {
+    const connection = await getConnection();
     try {
-        await createTable("roles", sqlSentences.rolesTable);
-        const connection = await getConnection();
-        await connection.execute(sqlSentences.insertRoles);
+        const registrationDate = new Date();
+        await connection.execute(`INSERT INTO registros (nombre, rol_id, huella_digital, fecha_registro)
+        VALUES (?, ?, ?, ?)`, [name, roleId, fingerprint, registrationDate]);
+        console.log("Register added succesfully");
         connection.end();
     } catch (e) {
         console.error(e);
+    } finally {
+        connection.end();
     }
-}
+};
+
+const insertWorker = async ({ username, password }) => {
+    const connection = await getConnection();
+    try {
+        const registrationDate = new Date();
+        await connection.execute(`INSERT INTO trabajadores (usuario, contraseña, fecha_registro)
+        VALUES (?, ?, ?)`, [username, password, registrationDate]);
+        console.log("Worker added succesfully");
+        connection.end();
+    } catch (e) {
+        console.error(e);
+    } finally {
+        connection.end();
+    }
+};
+
+const checkWorkerExists = async ({ username, password }) => {
+    const connection = await getConnection();
+    try {
+        const decryptedUsername = AES.decrypt(username, "enc_key").toString(enc.Utf8);
+        const decryptedPassword = AES.decrypt(password, "enc_key").toString(enc.Utf8);
+        const [result] = await connection.execute(`
+            SELECT COUNT(*)
+            FROM trabajadores
+            WHERE usuario = ? AND contraseña = ?
+        `, [decryptedUsername, decryptedPassword]);
+        const userExists = result[0]["COUNT(*)"] > 0;
+        return userExists;
+    } catch (e) {
+        console.error(e);
+    } finally {
+        connection.end();
+    }
+};
 
 const initDb = async () => {
     await createDb();
-    await createRolesTable();
-    await createTable("registros", sqlSentences.registerTable);
+    await createTables();
 };
 
-module.exports = { initDb };
+module.exports = { initDb, insertNewRegister, insertWorker };
 

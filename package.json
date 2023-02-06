@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "crypto-js": "^4.1.1",
+    "dotenv": "^16.0.3",
     "electron-squirrel-startup": "^1.0.0",
     "mysql2": "^3.0.1",
     "sequelize": "^6.28.0"
