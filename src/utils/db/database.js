@@ -1,25 +1,15 @@
-//const { Sequelize, DataTypes } = require("sequelize");
-//const { dbConnection } = require("./config");
-const { Worker, Role, Register } = require("./models");
+const { Worker, Role, Register, createRoles } = require("./models");
 
-const createWorker = async (worker) => {
+const syncModels = async () => {
     try {
-        const newWorker = await Worker.create(worker);
-        console.log("Worker auto-generated ID:", newWorker.id);
-    } catch (e) {
-        console.error(e);
-    }
-
-};
-
-const createRegister = async (register) => {
-    try {
-        const newRegister = await Register.create(register);
-        console.log("Worker auto-generated ID:", newRegister.id);
+        await Role.sync();
+        await Worker.sync();
+        await Register.sync();
+        await createRoles();
+        console.log("All models were synchronized successfully.");
     } catch (e) {
         console.error(e);
     }
 };
 
-module.exports = { createWorker, createRegister };
-
+module.exports = { syncModels };

@@ -1,8 +1,7 @@
 const { DataTypes } = require("sequelize");
-const { dbConnection } = require("./config");
+const { dbConnection } = require("./connection");
 
 const Worker = dbConnection.define("Worker", {
-    //Model attributes are defined here
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -56,25 +55,20 @@ const Register = dbConnection.define("Register", {
     }
 });
 
-const syncModels = async () => {
+const createRoles = async () => {
     try {
-        await Worker.sync();
-        await Role.sync();
-        await Register.sync();
         const roleCount = await Role.count();
         if (roleCount === 0) {
             await Role.bulkCreate([
                 { name: "Trabajador" },
-                { name: "Cliente" },
-                { name: "Expositor" }
+                { name: "Expositor" },
+                { name: "General" },
+                { name: "Cortesia" }
             ]);
         }
-        console.log("All models were synchronized successfully.");
     } catch (e) {
         console.error(e);
     }
 };
 
-syncModels();
-
-module.exports = { Worker, Role, Register };
+module.exports = { Worker, Role, Register, createRoles };

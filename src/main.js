@@ -1,8 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const crypto = require("./utils/crypto");
-const { syncModels } = require("./utils/db/models");
-const db = require("./utils/db/database");
+const { syncModels } = require("./utils/db/database");
 
 const createMainWindow = () => {
     const window = new BrowserWindow({
@@ -19,6 +18,7 @@ const createMainWindow = () => {
 };
 
 app.whenReady().then(async () => {
+    await syncModels();
     createMainWindow();
     
     ipcMain.on("new-window", (event, file) => {
