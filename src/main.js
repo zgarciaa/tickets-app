@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const crypto = require("./utils/crypto");
+const { syncModels } = require("./utils/db/models");
 const db = require("./utils/db/database");
 
 const createMainWindow = () => {
@@ -19,9 +20,7 @@ const createMainWindow = () => {
 
 app.whenReady().then(async () => {
     createMainWindow();
-    // Initialize database
-    await db.initDb();
-    // Create New Window
+    
     ipcMain.on("new-window", (event, file) => {
         event.preventDefault();
         const newWindow = new BrowserWindow({
@@ -35,7 +34,7 @@ app.whenReady().then(async () => {
         });
         newWindow.loadFile(file);
     });
-    
+
     ipcMain.on("new-worker", (event, worker) => {
         const _worker = crypto.encryptData(worker);
         console.log(_worker);
