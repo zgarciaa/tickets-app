@@ -9,7 +9,7 @@ form.addEventListener("submit", (event) => {
 });
 
 btnRegister.addEventListener("click", () => {
-    ipcRenderer.send("new-window", "src/ui/userRegister/index.html");
+    ipcRenderer.send("new-window", "src/ui/register/operatorRegister.html");
     //window.newWindow.userRegister();
 });
 

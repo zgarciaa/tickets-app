@@ -1,7 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
-const crypto = require("./utils/crypto");
-const { syncModels } = require("./utils/db/database");
+const { encryptData } = require("./utils/crypto");
+const { syncModels } = require("./db/sync");
+const db = require("./db/functions");
 
 const createMainWindow = () => {
     const window = new BrowserWindow({
@@ -13,14 +14,16 @@ const createMainWindow = () => {
             contextIsolation: false
         }
     });
-    window.loadFile(path.join(__dirname, "./ui/login/index.html"));
+    window.loadFile(path.join(__dirname, "./ui/login/login.html"));
     window.webContents.openDevTools();
 };
 
 app.whenReady().then(async () => {
     await syncModels();
     createMainWindow();
-    
+
+    //Test create worker
+    await db.newOperator("template_default1");
     ipcMain.on("new-window", (event, file) => {
         event.preventDefault();
         const newWindow = new BrowserWindow({
@@ -35,9 +38,7 @@ app.whenReady().then(async () => {
         newWindow.loadFile(file);
     });
 
-    ipcMain.on("new-worker", (event, worker) => {
-        const _worker = crypto.encryptData(worker);
-        console.log(_worker);
-        //db.insertWorker(_worker);
+    ipcMain.on("new-operator", async (event, operator) => {
+        await db.newOperator(operator);
     });
 });

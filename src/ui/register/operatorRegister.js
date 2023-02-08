@@ -5,13 +5,13 @@ const form = document.querySelector("#form");
 
 form.addEventListener("submit", (event) => {
     event.preventDefault();
-    const worker = {
+    const operator = {
         username: username.value,
         password: password.value
     };
 
     // Send data to main
-    ipcRenderer.send("new-worker", worker);
+    ipcRenderer.send("new-operator", operator);
 });
 
 

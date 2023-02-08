@@ -1,6 +1,6 @@
 const { AES, enc } = require("crypto-js");
-
 require("dotenv").config();
+
 const encryptData = ({ username, password }, decrypt = false) => {
     const key = enc.Base64.parse(process.env.ENC_KEY);
     const iv = enc.Base64.parse(process.env.ENC_IV);
