@@ -1,20 +1,17 @@
-Trabajar en la asignacion de stand a un numero determinado de manillas para el acceso.
-Asignacion de stand al numero de expositores
+# Tickets-App
 
-#IMPORTANTE
+Tickets-App is a desktop application designed for ticket sales and event access control using a fingerprint sensor. This application streamlines the process of ticket sales and access control, making it easier and more convenient for event organizers and attendees.
 
-Buscar sensores dactilares mejores.
-Trabajar en el control de acceso con huella dactilar.
+## Features
 
-Tabla stand => id, valor, nro expositores, nombre / num del stand.
-Tabla venta => id, stand?, nro expositores, valor.
-Trabajar en el dashboard que permita visualizar el numero de boletas vendidas en cada turno.
+- Easy ticket sales: With Tickets-App, event organizers can easily sell tickets for their events. The user-friendly interface allows for quick and efficient sales, and the system keeps track of ticket inventory in real-time.
 
+- Secure access control: The fingerprint sensor provides a secure and reliable way to control access to events. Attendees can quickly and easily have their fingerprints scanned, and the system will verify their ticket to grant or deny access.
 
+- Real-time monitoring: The application provides real-time monitoring of ticket sales and event attendance, allowing event organizers to get an accurate picture of their event at any time.
 
+- Customizable event settings: Tickets-App allows event organizers to customize various settings for their event, such as the number of tickets available, the date and time of the event, and access control settings.
 
-Mirar sistema que permita visualizar los stand que estan ocupados y disponibles ( mostrar ubicacion tipo cine )
+## Conclusion
 
-Seguir trabajando en la generacion de los tiquetes
-
-Lectores de huella dactiral:
+Tickets-App is an innovative solution for event organizers who are looking to streamline the ticket sales and access control process. With its user-friendly interface, secure access control, and real-time monitoring capabilities, Tickets-App is the perfect tool for anyone looking to simplify their event management process.

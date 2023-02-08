@@ -21,7 +21,6 @@ const createMainWindow = () => {
 app.whenReady().then(async () => {
     await syncModels();
     createMainWindow();
-
     //Test create worker
     await db.newOperator("template_default1");
     ipcMain.on("new-window", (event, file) => {
