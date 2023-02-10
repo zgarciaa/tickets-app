@@ -8,9 +8,11 @@ const Fingerprint = dbConnection.define("Fingerprint", {
         autoIncrement: true
     },
     template: {
-        type: DataTypes.STRING
+        type: DataTypes.BLOB,
+        allowNull: false,
+        unique: true
     },
-    ownerId: {
+    ownerId : {
         type: DataTypes.INTEGER,
         allowNull: false
     },
@@ -51,6 +53,11 @@ const User = dbConnection.define("User", {
     lastName: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    document: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        unique: true
     }
 });
 
@@ -76,10 +83,12 @@ const Stand = dbConnection.define("Stand", {
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     isAvailable: {
-        type: DataTypes.BOOLEAN
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
     },
     price: {
         type: DataTypes.INTEGER,
@@ -87,7 +96,8 @@ const Stand = dbConnection.define("Stand", {
     },
     numExpositors: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+
     }
 });
 
@@ -97,11 +107,13 @@ const Sale = dbConnection.define("Sale", {
         primaryKey: true,
         autoIncrement: true
     },
-    isStand: {
-        type: DataTypes.BOOLEAN
+    clientName: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
-    numExpositors: {
-        type: DataTypes.INTEGER
+    clientLastName: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
     price: {
         type: DataTypes.INTEGER,
@@ -109,14 +121,16 @@ const Sale = dbConnection.define("Sale", {
     }
 });
 
-Operator.hasOne(Fingerprint, { foreignKey: "ownerId", scope: { ownerType: "operator" } }); // Each operator have one fingerprint
-Fingerprint.belongsTo(Operator, { foreignKey: "ownerId" }); // Each fingerprint have one operator
+// Relations between Models
+//Operator.hasOne(Fingerprint, { foreignKey: "ownerId", scope: { ownerType: "operator" } }); // Each operator have one fingerprint
+//User.hasOne(Fingerprint, { foreignKey: "ownerId", scope: { ownerType: "user" } }); // Each user have one fingerprint
+//Fingerprint.belongsTo(Operator, { foreignKey: "ownerId" }); // Each fingerprint have one operator
+//Fingerprint.belongsTo(User, { foreignKey: "ownerId" }); // Each fingerprint have one user
 
+User.belongsTo(Role, { foreignKey: "roleId" }); // Each user have one role
+Role.hasMany(User, { foreignKey: "roleId" });   // Each role can have many users
 
-User.hasOne(Fingerprint, { foreignKey: "ownerId", scope: { ownerType: "user" } }); // Each user have one fingerprint
-Fingerprint.belongsTo(User, { foreignKey: "ownerId" }); // Each fingerprint have one user
-
-User.belongsTo(Role, { foreignKey: "RoleId" }); // Each user have one role
-Role.hasMany(User, { foreignKey: "RoleId" });   // Each role can have many users
+Sale.belongsTo(Stand, { foreignKey: "standId", allowNull: true}); // Each Sale have one Stand
+Stand.hasMany(Sale, { foreignKey: "standId" }); //Each Stand have many Sales
 
 module.exports = { Operator, Role, User, Fingerprint, Stand, Sale };

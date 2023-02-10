@@ -1,6 +1,5 @@
 const { Operator, Role, User, Fingerprint, Stand, Sale } = require("./models");
 const { dbConnection } = require("./connection");
-const { Stats } = require("original-fs");
 
 const createFingerprint = async (fingerprint) => {
     let newFingerprint;
@@ -36,18 +35,49 @@ const createOperator = async (operator) => {
     }
 };
 
-const newOperator = async (template) => {
+const createUser = async (user) => {
+    let newUser;
     try {
-        const operatorId = await createOperator({
-            username: "username_default1",
-            password: "password_default1"
+        await dbConnection.transaction(async (t) => {
+            const _user = await User.findOne({
+                where: {
+                    document: user.document
+                }
+            });
+            if (!_user) {
+                newUser = await User.create(user, { transaction: t });
+                console.log("User created, ID:", newUser.id);
+            }
         });
+        return newUser.id;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+const newOperator = async (operator, template) => {
+    try {
+        const operatorId = await createOperator(operator);
         const fingerprintId = await createFingerprint({
             template: template,
             ownerId: operatorId,
             ownerType: "operator"
         });
         console.log("Operator created: ", operatorId, fingerprintId);
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+const newUser = async (user, template) => {
+    try {
+        const userId = await createUser(user);
+        const fingerprintId = await createFingerprint({
+            template: template,
+            ownerId: userId,
+            ownerType: "user"
+        });
+        console.log("User created: ", userId, fingerprintId);
     } catch (e) {
         console.error(e);
     }
@@ -82,11 +112,50 @@ const createStands = async () => {
                     { name: "Stand4", isAvailable: true, price: 40000, numExpositors: 4 },
                 ], { transaction: t });
             });
+            console.log("Test Roles added succesfully");
         }
     } catch (e) {
         console.error(e);
     }
 };
 
-module.exports = { createRoles, createStands, newOperator };
+const createTestOperators = async () => {
+    try {
+        await newOperator({
+            username: "username_1",
+            password: "password_1"
+        }, 0x01);
+        await newOperator({
+            username: "username_2",
+            password: "password_2"
+        }, 0x02);
+        await newOperator({
+            username: "username_3",
+            password: "password_3"
+        }, 0x03);
+        await newOperator({
+            username: "username_4",
+            password: "password_4"
+        }, 0x04);
+
+        console.log("Test Operators added succesfully");
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+const newSale = async (sale) => {
+    let newSale;
+    try {
+        await dbConnection.transaction(async (t) => {
+            newSale = await Sale.create(sale, { transaction: t });
+            console.log("Sale created, ID:", newSale.id);
+        });
+        return newSale.id;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+module.exports = { createRoles, createStands, newOperator, newUser, createTestOperators, newSale };
 

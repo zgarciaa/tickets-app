@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const { encryptData } = require("./utils/crypto");
-const { syncModels } = require("./db/sync");
+const { initDb } = require("./db/database");
 const db = require("./db/functions");
 
 const createMainWindow = () => {
@@ -19,10 +19,8 @@ const createMainWindow = () => {
 };
 
 app.whenReady().then(async () => {
-    await syncModels();
+    await initDb();
     createMainWindow();
-    //Test create worker
-    await db.newOperator("template_default1");
     ipcMain.on("new-window", (event, file) => {
         event.preventDefault();
         const newWindow = new BrowserWindow({
@@ -36,8 +34,15 @@ app.whenReady().then(async () => {
         });
         newWindow.loadFile(file);
     });
-
-    ipcMain.on("new-operator", async (event, operator) => {
-        await db.newOperator(operator);
+    ipcMain.on("new-operator", async (event, operator, template) => {
+        //await db.newOperator(operator, template);
     });
+    ipcMain.on("new-user", async (event, user) => {
+        let BLOB = parseInt(Math.floor(Math.random() * 256).toString(2).padStart(8, '0'), 2);
+        console.log(BLOB);
+        await db.newUser(user, BLOB);
+    });
+    ipcMain.on("new-sale", async (event, sale) => {
+        await db.newSale(sale);
+    })
 });
